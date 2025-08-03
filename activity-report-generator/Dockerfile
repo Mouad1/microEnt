@@ -10,16 +10,19 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy source code
 COPY . .
 
 # Build the application for production
-RUN npm run build --prod
+RUN npm run build
 
 # Stage 2: Serve the application with Nginx
 FROM nginx:alpine
+
+# Install bash for better debugging and compatibility with Dokploy
+RUN apk add --no-cache bash curl
 
 # Copy the built application from the previous stage
 COPY --from=build /app/dist/activity-report-generator /usr/share/nginx/html
