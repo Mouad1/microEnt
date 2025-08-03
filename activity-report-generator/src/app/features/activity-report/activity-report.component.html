@@ -1,0 +1,87 @@
+<div class="container">
+  <h1>Activity Report Generator</h1>
+
+  <form [formGroup]="reportForm" class="form-container">
+    <div class="form-group">
+      <label for="clientName">Client Name:</label>
+      <input id="clientName" type="text" formControlName="clientName" class="form-control"
+        placeholder="Enter client name">
+      @if (reportForm.get('clientName')?.errors?.['required'] && reportForm.get('clientName')?.touched) {
+      <span class="error">Client Name is required</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="projectName">Project Name:</label>
+      <input id="projectName" type="text" formControlName="projectName" class="form-control"
+        placeholder="Enter project name">
+      @if (reportForm.get('projectName')?.errors?.['required'] && reportForm.get('projectName')?.touched) {
+      <span class="error">Project Name is required</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="subject">Subject:</label>
+      <input id="subject" type="text" formControlName="subject" class="form-control"
+        placeholder="Enter subject/description">
+      @if (reportForm.get('subject')?.errors?.['required'] && reportForm.get('subject')?.touched) {
+      <span class="error">Subject is required</span>
+      }
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="month">Month:</label>
+        <select id="month" formControlName="month" class="form-control">
+          @for (monthName of monthNames; track monthName; let i = $index) {
+          <option [value]="i + 1">{{monthName}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="year">Year:</label>
+        <input id="year" type="number" formControlName="year" class="form-control" min="2000" max="2100">
+      </div>
+    </div>
+  </form>
+
+  <div class="calendar-container">
+    <div class="calendar-header">
+      @for (day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track day) {
+      <div class="weekday">{{day}}</div>
+      }
+    </div>
+
+    <div class="calendar">
+      @for (offset of getFirstDayOffset(); track offset) {
+      <div class="day empty"></div>
+      }
+
+      @for (info of daysInfo(); track info.day) {
+      <div class="day" [class.worked]="info.status === 'Worked'" [class.today]="isToday(info.day)"
+        (click)="toggleDay(info.day - 1)">
+        <span class="day-number">{{info.day}}</span>
+        <span class="day-name">{{info.weekday}}</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <div class="summary-section">
+    <div class="summary-item">
+      <span class="label">Total Days Worked:</span>
+      <span class="value">{{workedDaysCount}} days</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="export-options">
+      <select [formControl]="exportControl" class="form-control export-select">
+        <option value="pdf">PDF Format (.pdf)</option>
+        <option value="excel">Excel Format (.xlsx)</option>
+      </select>
+      <button (click)="print()" [disabled]="reportForm.invalid" class="btn btn-primary">Generate Report</button>
+    </div>
+  </div>
+</div>

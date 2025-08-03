@@ -1,0 +1,25 @@
+# Dokploy Configuration
+
+# This file helps Dokploy understand how to build and deploy your app
+
+# Build settings
+
+NODE_VERSION=18
+NPM_VERSION=latest
+
+# App settings
+
+PORT=80
+NODE_ENV=production
+
+# Build command (Dokploy will use this)
+
+BUILD_COMMAND=npm run build
+
+# Start command (for Node.js apps, not needed for static builds)
+
+# START_COMMAND=npm start
+
+# Health check endpoint (optional)
+
+# HEALTH_CHECK_PATH=/health

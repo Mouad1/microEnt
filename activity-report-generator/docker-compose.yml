@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  activity-report-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    container_name: activity-report-generator
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    # Optional: Add volume for logs
+    volumes:
+      - ./logs:/var/log/nginx
+
+  # Development service (alternative)
+  activity-report-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4200:4200"
+    container_name: activity-report-generator-dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    profiles:
+      - dev
