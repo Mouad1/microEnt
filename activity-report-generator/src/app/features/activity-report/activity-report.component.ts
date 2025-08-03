@@ -5,13 +5,10 @@ import {
   ReactiveFormsModule,
   Validators,
   FormsModule,
-  FormGroup,
-  NonNullableFormBuilder,
   FormControl,
 } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 interface DayInfo {
   day: number;
@@ -30,7 +27,7 @@ interface ActivityReportForm {
 @Component({
   selector: 'app-activity-report',
   templateUrl: './activity-report.component.html',
-  styleUrls: ['./activity-report.component.css'],
+  styleUrls: ['./activity-report.component.scss'],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
 })
@@ -144,6 +141,18 @@ export class ActivityReportComponent implements OnInit {
     this.workedDays.set(currentWorkedDays);
   }
 
+  onRightClick(event: MouseEvent, index: number): void {
+    event.preventDefault();
+    // Handle right-click functionality if needed
+    // For now, just toggle the day like a regular click
+    this.toggleDay(index);
+  }
+
+  getDayTooltip(dayInfo: DayInfo): string {
+    const status = dayInfo.status === 'Worked' ? 'Worked' : 'Not Worked';
+    return `${dayInfo.weekday}, ${dayInfo.day} - ${status}`;
+  }
+
   getFirstDayOffset(): number[] {
     const year = this.reportForm.get('year')?.value;
     const month = this.reportForm.get('month')?.value;
@@ -166,6 +175,17 @@ export class ActivityReportComponent implements OnInit {
       today.getMonth() === month - 1 &&
       today.getFullYear() === year
     );
+  }
+
+  isWeekend(day: number): boolean {
+    const year = this.reportForm.get('year')?.value;
+    const month = this.reportForm.get('month')?.value;
+
+    if (!year || !month) return false;
+
+    const date = new Date(year, month - 1, day);
+    const dayOfWeek = date.getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6; // Sunday = 0, Saturday = 6
   }
 
   setExportFormat(format: 'excel' | 'pdf'): void {
@@ -272,141 +292,323 @@ export class ActivityReportComponent implements OnInit {
       format: 'a4',
     });
 
+    // A4 dimensions: 210mm x 297mm
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+
     // Set document properties
     doc.setProperties({
       title: 'Activity Report',
       subject: formValue.subject,
       author: formValue.clientName,
-      keywords: 'activity report, timesheet',
+      keywords: 'activity report, timesheet, calendar',
       creator: 'Activity Report Generator',
     });
 
-    // Add header
-    doc.setFontSize(16);
+    let currentY = this.drawPDFHeader(
+      doc,
+      pageWidth,
+      monthName,
+      formValue,
+      margin
+    );
+    currentY = this.drawPDFCalendar(doc, pageWidth, margin, currentY);
+    this.drawPDFFooter(doc, pageWidth, pageHeight, currentY);
+
+    // Save the PDF
+    const fileName = `activity-report-calendar-${formValue.clientName}-${monthName}-${formValue.year}.pdf`;
+    doc.save(fileName);
+  }
+
+  private drawPDFHeader(
+    doc: any,
+    pageWidth: number,
+    monthName: string,
+    formValue: {
+      clientName: string;
+      projectName: string;
+      subject: string;
+      year: number;
+    },
+    margin: number
+  ): number {
+    // Header section
+    doc.setFontSize(18);
     doc.setTextColor(44, 62, 80);
-    doc.text('Activity Report', doc.internal.pageSize.width / 2, 12, {
+    doc.text('Activity Report', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(14);
+    doc.text(`${monthName} ${formValue.year}`, pageWidth / 2, 30, {
       align: 'center',
     });
 
-    // Add horizontal line
-    doc.setDrawColor(44, 62, 80);
-    doc.setLineWidth(0.5);
-    doc.line(15, 15, doc.internal.pageSize.width - 15, 15);
-
-    // Basic information section
+    // Client information section
     doc.setFontSize(10);
     doc.setTextColor(52, 73, 94);
-    const startY = 25;
-    const leftMargin = 15;
-    const lineHeight = 5;
+    let currentY = 45;
 
-    // Client and Project Information
     doc.setFont('helvetica', 'bold');
-    doc.text('Client Information', leftMargin, startY);
-    doc.setFont('helvetica', 'normal');
-    doc.text(
-      `Client Name: ${formValue.clientName}`,
-      leftMargin + 5,
-      startY + lineHeight
-    );
-    doc.text(
-      `Project: ${formValue.projectName}`,
-      leftMargin + 5,
-      startY + lineHeight * 2
-    );
-    doc.text(
-      `Subject: ${formValue.subject}`,
-      leftMargin + 5,
-      startY + lineHeight * 3
-    );
-    doc.text(
-      `Period: ${monthName} ${formValue.year}`,
-      leftMargin + 5,
-      startY + lineHeight * 4
-    );
+    doc.text('Client Information', margin, currentY);
+    currentY += 6;
 
-    // Summary section
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Client: ${formValue.clientName}`, margin + 5, currentY);
+    currentY += 5;
+    doc.text(`Project: ${formValue.projectName}`, margin + 5, currentY);
+    currentY += 5;
+    doc.text(`Subject: ${formValue.subject}`, margin + 5, currentY);
+    currentY += 10;
+
+    return currentY;
+  }
+
+  private drawPDFCalendar(
+    doc: any,
+    pageWidth: number,
+    margin: number,
+    startY: number
+  ): number {
+    const contentWidth = pageWidth - margin * 2;
+    const cellWidth = contentWidth / 7;
+    const cellHeight = 20;
+
+    // Calendar section
     doc.setFont('helvetica', 'bold');
-    doc.text('Summary', leftMargin, startY + lineHeight * 6);
+    doc.setFontSize(12);
+    doc.text('Calendar View', margin, startY);
+    let currentY = startY + 10;
+
+    // Get calendar data
+    const daysInMonth = this.days().length;
+    const firstDayOffset = this.getFirstDayOffset().length;
+
+    // Draw calendar header
+    this.drawCalendarHeader(doc, margin, currentY, cellWidth, cellHeight);
+    currentY += cellHeight;
+
+    // Draw calendar days
+    const rowsNeeded = Math.ceil((daysInMonth + firstDayOffset) / 7);
+    this.drawCalendarDays(doc, {
+      margin,
+      startY: currentY,
+      cellWidth,
+      cellHeight,
+      daysInMonth,
+      firstDayOffset,
+      rowsNeeded,
+    });
+    currentY += rowsNeeded * cellHeight + 15;
+
+    // Draw legend and summary
+    currentY = this.drawLegendAndSummary(doc, margin, currentY, daysInMonth);
+
+    return currentY;
+  }
+
+  private drawCalendarHeader(
+    doc: any,
+    margin: number,
+    startY: number,
+    cellWidth: number,
+    cellHeight: number
+  ): void {
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(44, 62, 80);
+
+    for (let i = 0; i < 7; i++) {
+      const x = margin + i * cellWidth;
+      const y = startY;
+
+      // Header cell background
+      doc.setFillColor(240, 240, 240);
+      doc.rect(x, y, cellWidth, cellHeight, 'F');
+
+      // Header cell border
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(x, y, cellWidth, cellHeight, 'S');
+
+      // Day name text
+      doc.setTextColor(44, 62, 80);
+      doc.text(daysOfWeek[i], x + cellWidth / 2, y + cellHeight / 2 + 2, {
+        align: 'center',
+      });
+    }
+  }
+
+  private drawCalendarDays(
+    doc: any,
+    config: {
+      margin: number;
+      startY: number;
+      cellWidth: number;
+      cellHeight: number;
+      daysInMonth: number;
+      firstDayOffset: number;
+      rowsNeeded: number;
+    }
+  ): void {
     doc.setFont('helvetica', 'normal');
-    doc.text(
-      `Total Days Worked: ${this.workedDaysCount()} days`,
-      leftMargin + 5,
-      startY + lineHeight * 7
-    );
+    doc.setFontSize(11);
 
-    // Format table data
-    const tableData = workedDaysInfo.map((info) => [
-      info.day.toString().padStart(2, '0'),
-      info.weekday,
-      info.status,
-    ]);
+    let dayIndex = 0;
 
-    // Add daily report table
-    autoTable(doc, {
-      startY: startY + lineHeight * 10,
-      head: [['Day', 'Weekday', 'Status']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [44, 62, 80],
-        textColor: 255,
-        fontStyle: 'bold',
-        halign: 'center',
-        fontSize: 9,
-      },
-      styles: {
-        fontSize: 9,
-        cellPadding: 2,
-        valign: 'middle',
-        lineColor: [44, 62, 80],
-        lineWidth: 0.1,
-        halign: 'center',
-      },
-      margin: { left: 15, right: 15 },
-      columnStyles: {
-        0: { cellWidth: 20 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 30 },
-      },
-      alternateRowStyles: {
-        fillColor: [240, 240, 240],
-      },
-      didDrawCell: (data) => {
-        // Add borders
-        const doc = data.doc;
-        const cell = data.cell;
-        doc.setDrawColor(44, 62, 80);
-        doc.setLineWidth(0.1);
-        doc.line(cell.x, cell.y, cell.x + cell.width, cell.y);
-        doc.line(
-          cell.x,
-          cell.y + cell.height,
-          cell.x + cell.width,
-          cell.y + cell.height
-        );
-        doc.line(cell.x, cell.y, cell.x, cell.y + cell.height);
-        doc.line(
-          cell.x + cell.width,
-          cell.y,
-          cell.x + cell.width,
-          cell.y + cell.height
-        );
-      },
+    for (let row = 0; row < config.rowsNeeded; row++) {
+      for (let col = 0; col < 7; col++) {
+        const x = config.margin + col * config.cellWidth;
+        const y = config.startY + row * config.cellHeight;
+        const cellIndex = row * 7 + col;
+
+        if (
+          cellIndex < config.firstDayOffset ||
+          dayIndex >= config.daysInMonth
+        ) {
+          this.drawEmptyCell(doc, x, y, config.cellWidth, config.cellHeight);
+        } else {
+          this.drawDayCell(
+            doc,
+            x,
+            y,
+            config.cellWidth,
+            config.cellHeight,
+            dayIndex + 1,
+            dayIndex
+          );
+          dayIndex++;
+        }
+      }
+    }
+  }
+
+  private drawEmptyCell(
+    doc: any,
+    x: number,
+    y: number,
+    cellWidth: number,
+    cellHeight: number
+  ): void {
+    doc.setFillColor(250, 250, 250);
+    doc.rect(x, y, cellWidth, cellHeight, 'F');
+    doc.setDrawColor(220, 220, 220);
+    doc.rect(x, y, cellWidth, cellHeight, 'S');
+  }
+
+  private drawDayCell(
+    doc: any,
+    x: number,
+    y: number,
+    cellWidth: number,
+    cellHeight: number,
+    dayNumber: number,
+    dayIndex: number
+  ): void {
+    const isWorked = this.workedDays()[dayIndex];
+    const isWeekend = this.isWeekend(dayNumber);
+    const isToday = this.isToday(dayNumber);
+
+    // Cell background color
+    if (isWorked) {
+      doc.setFillColor(72, 187, 120); // Green for worked days
+    } else if (isWeekend) {
+      doc.setFillColor(237, 242, 247); // Light gray for weekends
+    } else {
+      doc.setFillColor(255, 255, 255); // White for regular days
+    }
+
+    doc.rect(x, y, cellWidth, cellHeight, 'F');
+
+    // Cell border
+    if (isToday) {
+      doc.setDrawColor(66, 153, 225); // Blue border for today
+      doc.setLineWidth(1);
+    } else {
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
+    }
+    doc.rect(x, y, cellWidth, cellHeight, 'S');
+
+    // Day number text
+    if (isWorked) {
+      doc.setTextColor(255, 255, 255); // White text on green background
+    } else {
+      doc.setTextColor(45, 55, 72); // Dark text
+    }
+
+    doc.setFont('helvetica', isToday ? 'bold' : 'normal');
+    doc.text(dayNumber.toString(), x + cellWidth / 2, y + cellHeight / 2 + 2, {
+      align: 'center',
+    });
+  }
+
+  private drawLegendAndSummary(
+    doc: any,
+    margin: number,
+    startY: number,
+    daysInMonth: number
+  ): number {
+    // Legend section
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(44, 62, 80);
+    doc.text('Legend:', margin, startY);
+
+    // Legend items
+    const legendItems = [
+      { color: [72, 187, 120], text: 'Worked Days' },
+      { color: [237, 242, 247], text: 'Weekends' },
+      { color: [255, 255, 255], text: 'Regular Days' },
+    ];
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+
+    legendItems.forEach((item, index) => {
+      const legendItemY = startY + 8 + index * 8;
+
+      // Legend color box
+      doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+      doc.rect(margin + 5, legendItemY - 3, 8, 5, 'F');
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(margin + 5, legendItemY - 3, 8, 5, 'S');
+
+      // Legend text
+      doc.setTextColor(45, 55, 72);
+      doc.text(item.text, margin + 18, legendItemY);
     });
 
-    // Add footer
-    doc.setFontSize(8);
-    doc.setTextColor(128);
+    // Summary section
+    const summaryY = startY + 35;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(44, 62, 80);
+    doc.text('Summary:', margin, summaryY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
     doc.text(
-      `Generated on: ${new Date().toLocaleDateString()}`,
-      doc.internal.pageSize.width / 2,
-      doc.internal.pageSize.height - 5,
-      { align: 'center' }
+      `Total Days Worked: ${this.workedDaysCount()} days`,
+      margin + 5,
+      summaryY + 8
     );
 
-    // Save the PDF
-    const fileName = `activity-report-${formValue.clientName}-${monthName}-${formValue.year}.pdf`;
-    doc.save(fileName);
+    return summaryY + 15;
+  }
+
+  private drawPDFFooter(
+    doc: any,
+    pageWidth: number,
+    pageHeight: number,
+    currentY: number
+  ): void {
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text(
+      `Generated on: ${new Date().toLocaleDateString()}`,
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: 'center' }
+    );
   }
 }

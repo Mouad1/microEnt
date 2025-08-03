@@ -58,9 +58,11 @@
       <div class="day empty"></div>
       }
 
-      @for (info of daysInfo(); track info.day) {
-      <div class="day" [class.worked]="info.status === 'Worked'" [class.today]="isToday(info.day)"
-        (click)="toggleDay(info.day - 1)">
+      @for (info of daysInfo(); track info.day; let i = $index) {
+      <div class="day" [class.weekend]="isWeekend(info.day)" [class.worked]="info.status === 'Worked'"
+        [class.today]="isToday(info.day)" [title]="getDayTooltip(info)" [attr.tabindex]="0" [attr.role]="'button'"
+        [attr.aria-label]="getDayTooltip(info)" (click)="toggleDay(i)" (contextmenu)="onRightClick($event, i)"
+        (keydown.enter)="toggleDay(i)" (keydown.space)="toggleDay(i)">
         <span class="day-number">{{info.day}}</span>
         <span class="day-name">{{info.weekday}}</span>
       </div>
