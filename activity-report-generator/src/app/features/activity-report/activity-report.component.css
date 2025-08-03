@@ -166,23 +166,6 @@ label {
   text-transform: uppercase;
 }
 
-.summary-section {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-}
-
-.summary-item:last-child {
-  margin-bottom: 0;
-}
-
 .label {
   font-weight: 600;
   color: #2d3748;
