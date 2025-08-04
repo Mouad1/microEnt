@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
+import { HeaderComponent } from '../../shared/components/header/header.component';
 
 interface DayInfo {
   day: number;
@@ -29,7 +30,7 @@ interface ActivityReportForm {
   templateUrl: './activity-report.component.html',
   styleUrls: ['./activity-report.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, HeaderComponent],
 })
 export class ActivityReportComponent implements OnInit {
   private readonly currentDate = new Date();

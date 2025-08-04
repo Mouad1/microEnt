@@ -1,0 +1,22 @@
+/* Header component styles - most styling is done with Tailwind classes */
+
+.nav-active {
+  background: linear-gradient(
+    to right,
+    rgb(238 242 255),
+    rgb(243 232 255)
+  ); /* gradient from indigo-50 to purple-50 */
+  color: rgb(67 56 202); /* text-indigo-700 */
+  font-weight: 600; /* font-semibold */
+  border: 1px solid rgb(199 210 254); /* border-indigo-200 */
+
+  &:hover {
+    background: linear-gradient(
+      to right,
+      rgb(224 231 255),
+      rgb(233 213 255)
+    ); /* gradient from indigo-100 to purple-100 */
+    color: rgb(55 48 163); /* text-indigo-800 */
+    border-color: rgb(165 180 252); /* border-indigo-300 */
+  }
+}

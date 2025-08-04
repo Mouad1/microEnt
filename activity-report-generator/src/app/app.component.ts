@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivityReportComponent } from './features/activity-report/activity-report.component';
+import { RouterOutlet, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [CommonModule, ActivityReportComponent],
+  imports: [CommonModule, RouterOutlet, RouterModule],
 })
 export class AppComponent {
-  title = 'activity-report-generator';
+  title = 'MicroEnterprise Management Suite';
 }

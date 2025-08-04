@@ -1,0 +1,117 @@
+<app-header></app-header>
+
+<div class="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <!-- Hero Section -->
+    <div class="relative pt-16 pb-32 overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.1),transparent_50%)]">
+        </div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(217,70,239,0.08),transparent_50%)]">
+        </div>
+        <div
+            class="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.1)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]">
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center animate-fade-in">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+                    Micro<span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Enterprise</span>
+                    <span class="block text-slate-300 text-3xl md:text-5xl font-normal mt-2">Management Suite</span>
+                </h1>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                    Streamline your freelance business with our comprehensive suite of professional tools.
+                    From activity reports to financial management - everything you need in one place.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                    <ui-button variant="primary" size="lg" icon="🚀">
+                        Get Started
+                    </ui-button>
+                    <ui-button variant="outline" size="lg" icon="📖">
+                        Learn More
+                    </ui-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="relative -mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            @for (feature of features; track feature.id) {
+            <ui-card variant="glass" [hover]="true" [class]="feature.available ? '' : 'opacity-70 cursor-not-allowed'"
+                [attr.tabindex]="feature.available ? 0 : -1" [attr.role]="'button'"
+                [attr.aria-label]="feature.title + ': ' + feature.description" (click)="navigateToFeature(feature)"
+                (keydown.enter)="navigateToFeature(feature)" (keydown.space)="navigateToFeature(feature)">
+
+                <!-- Card Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="text-5xl">{{ feature.icon }}</div>
+                    @if (feature.comingSoon) {
+                    <ui-badge variant="warning" size="md">
+                        Coming Soon
+                    </ui-badge>
+                    } @else if (feature.available) {
+                    <ui-badge variant="primary" size="md">
+                        Available
+                    </ui-badge>
+                    }
+                </div>
+
+                <!-- Card Body -->
+                <div>
+                    <h3
+                        class="text-2xl font-semibold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+                        {{ feature.title }}
+                    </h3>
+                    <p class="text-slate-600 leading-relaxed mb-4">
+                        {{ feature.description }}
+                    </p>
+
+                    @if (feature.available) {
+                    <div
+                        class="flex items-center text-indigo-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>Launch Application</span>
+                        <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </div>
+                    } @else {
+                    <div class="flex items-center text-slate-400 font-medium">
+                        <span>In Development</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    }
+                </div>
+            </ui-card>
+            }
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-300 border-t border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <span class="text-3xl mr-3">🏢</span>
+                    <span class="text-xl font-semibold text-white">MicroEnterprise Suite</span>
+                </div>
+                <p class="text-slate-400 mb-6 max-w-2xl mx-auto">
+                    Empowering freelancers and small businesses with professional-grade management tools.
+                    Built with modern technology for the modern entrepreneur.
+                </p>
+                <div class="border-t border-slate-700 pt-6">
+                    <p class="text-sm">
+                        &copy; 2025 MicroEnterprise Management Suite. Built with <span class="text-purple-400">❤️</span>
+                        for entrepreneurs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
