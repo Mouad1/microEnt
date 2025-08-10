@@ -14,17 +14,72 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="flex space-x-1">
-                <a routerLink="/dashboard" routerLinkActive="nav-active"
-                    class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-indigo-50 hover:border-indigo-100 transition-all border border-transparent">
-                    <span class="text-lg">🏠</span>
-                    <span class="hidden sm:inline">Dashboard</span>
-                </a>
-                <a routerLink="/activity-report" routerLinkActive="nav-active"
-                    class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-indigo-50 hover:border-indigo-100 transition-all border border-transparent">
-                    <span class="text-lg">📊</span>
-                    <span class="hidden sm:inline">Activity Report</span>
-                </a>
+            <nav class="flex items-center space-x-1">
+                <!-- Navigation Links (only visible when authenticated) -->
+                <ng-container *ngIf="isAuthenticated$ | async">
+                    <a routerLink="/dashboard" routerLinkActive="nav-active"
+                        class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-indigo-50 hover:border-indigo-100 transition-all border border-transparent">
+                        <span class="text-lg">🏠</span>
+                        <span class="hidden sm:inline">Dashboard</span>
+                    </a>
+                    <a routerLink="/activity-report" routerLinkActive="nav-active"
+                        class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-indigo-50 hover:border-indigo-100 transition-all border border-transparent">
+                        <span class="text-lg">📊</span>
+                        <span class="hidden sm:inline">Activity Report</span>
+                    </a>
+
+                    <!-- Admin only navigation -->
+                    <a *ngIf="isAdmin$ | async" routerLink="/configuration" routerLinkActive="nav-active"
+                        class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-indigo-50 hover:border-indigo-100 transition-all border border-transparent">
+                        <span class="text-lg">⚙️</span>
+                        <span class="hidden sm:inline">Configuration</span>
+                    </a>
+                    <a *ngIf="isAdmin$ | async" routerLink="/documentation" routerLinkActive="nav-active"
+                        class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-indigo-50 hover:border-indigo-100 transition-all border border-transparent">
+                        <span class="text-lg">📚</span>
+                        <span class="hidden sm:inline">Private Docs</span>
+                    </a>
+                </ng-container>
+
+                <!-- User Profile and Auth Controls -->
+                <div class="flex items-center space-x-2 ml-4 border-l border-slate-200 pl-4">
+                    <!-- Authenticated User -->
+                    <ng-container *ngIf="isAuthenticated$ | async; else loginButton">
+                        <div class="flex items-center space-x-3">
+                            <!-- Admin Mode Indicator -->
+                            <div *ngIf="isAdmin$ | async"
+                                class="flex items-center px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-medium rounded-full">
+                                <span class="text-xs">👑</span>
+                                <span class="ml-1 hidden md:inline">Admin</span>
+                            </div>
+
+                            <!-- User Info -->
+                            <div *ngIf="user$ | async as user" class="flex items-center space-x-2">
+                                <img *ngIf="user.picture" [src]="user.picture" [alt]="user.name"
+                                    class="w-8 h-8 rounded-full border-2 border-indigo-100">
+                                <div class="hidden md:block">
+                                    <div class="text-sm font-medium text-slate-900">{{ user.name }}</div>
+                                    <div class="text-xs text-slate-500">{{ user.email }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Logout Button -->
+                            <button (click)="logout()"
+                                class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors">
+                                <span class="hidden sm:inline">Logout</span>
+                                <span class="sm:hidden">🚪</span>
+                            </button>
+                        </div>
+                    </ng-container>
+
+                    <!-- Login Button -->
+                    <ng-template #loginButton>
+                        <button (click)="login()"
+                            class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            Login
+                        </button>
+                    </ng-template>
+                </div>
             </nav>
         </div>
     </div>

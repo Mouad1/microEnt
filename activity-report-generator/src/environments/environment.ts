@@ -3,7 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  auth0: {
+    domain: 'dev-33u6z9rl.us.auth0.com',
+    clientId: 'DzcamW4rv7Iw4ItNne1Bp6JU90mLQIuD',
+    redirectUri: window.location.origin,
+    audience: undefined as string | undefined, // Only needed if you have a backend API
+  },
 };
 
 /*
@@ -13,4 +19,3 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
