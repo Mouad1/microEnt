@@ -36,6 +36,15 @@ export const routes: Routes = [
     data: { roles: [UserRole.ADMIN] }, // Only admin can access
   },
   {
+    path: 'documentation',
+    loadComponent: () =>
+      import(
+        './features/documentation-viewer/documentation-viewer.component'
+      ).then((m) => m.DocumentationViewerComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [UserRole.ADMIN] }, // Only admin can access private docs
+  },
+  {
     path: 'unauthorized',
     loadComponent: () =>
       import('./features/unauthorized/unauthorized.component').then(

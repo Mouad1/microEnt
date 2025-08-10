@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-configuration',
@@ -35,6 +36,14 @@ import { CommonModule } from '@angular/common';
           <h2>API Configuration</h2>
           <p>Configure external APIs and integrations</p>
           <button class="btn btn-primary">API Settings</button>
+        </div>
+
+        <div class="config-card">
+          <h2>Private Documentation</h2>
+          <p>Access private guides and documentation (Admin Only)</p>
+          <button class="btn btn-primary" (click)="openDocumentation()">
+            View Docs
+          </button>
         </div>
       </div>
     </div>
@@ -111,4 +120,11 @@ import { CommonModule } from '@angular/common';
     `,
   ],
 })
-export class ConfigurationComponent {}
+export class ConfigurationComponent {
+  constructor(private readonly router: Router) {}
+
+  openDocumentation() {
+    // Navigate to the private documentation viewer
+    this.router.navigate(['/documentation']);
+  }
+}
