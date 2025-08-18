@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 // Enterprise-grade configuration for different environments
 const getEnterpriseConfig = () => {
   const env = process.env.TEST_ENV || 'local';
-  
+
   const configs = {
     // Local Development - Mocked Auth
     local: {
@@ -24,8 +24,8 @@ const getEnterpriseConfig = () => {
           name: 'local-chrome',
           use: { browserName: 'chromium' },
           testMatch: '**/smoke/**/*.spec.ts', // Only smoke tests locally
-        }
-      ]
+        },
+      ],
     },
 
     // Test Environment - Real Auth with Test Users
@@ -43,8 +43,8 @@ const getEnterpriseConfig = () => {
           name: 'test-regression',
           use: { browserName: 'chromium' },
           testMatch: '**/tests/**/*.spec.ts',
-        }
-      ]
+        },
+      ],
     },
 
     // Staging Environment - Production-like
@@ -68,13 +68,14 @@ const getEnterpriseConfig = () => {
           name: 'staging-cross-browser',
           use: { browserName: 'firefox' },
           testMatch: '**/smoke/**/*.spec.ts',
-        }
-      ]
+        },
+      ],
     },
 
     // CI/CD Pipeline
     ci: {
-      baseURL: process.env.BASE_URL || 'https://test.activity-report-generator.com',
+      baseURL:
+        process.env.BASE_URL || 'https://test.activity-report-generator.com',
       use: {
         headless: true,
         screenshot: 'only-on-failure',
@@ -108,9 +109,9 @@ const getEnterpriseConfig = () => {
           use: { browserName: 'chromium' },
           testMatch: '**/enterprise/**/*.spec.ts',
           dependencies: ['setup'],
-        }
-      ]
-    }
+        },
+      ],
+    },
   };
 
   return configs[env as keyof typeof configs] || configs.local;
@@ -120,7 +121,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  
+
   // Reporter configuration for enterprise
   reporter: [
     ['html', { outputFolder: 'test-results/html-report' }],
@@ -128,10 +129,12 @@ export default defineConfig({
     ['junit', { outputFile: 'test-results/junit.xml' }],
     ['line'],
     // Enterprise reporting
-    ...(process.env.CI ? [
-      ['github'] as const,
-      ['./custom-enterprise-reporter.js', {}] as const // Custom enterprise reporter
-    ] : [])
+    ...(process.env.CI
+      ? [
+          ['github'] as const,
+          ['./custom-enterprise-reporter.js', {}] as const, // Custom enterprise reporter
+        ]
+      : []),
   ],
 
   // Global test configuration

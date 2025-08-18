@@ -13,8 +13,12 @@ export class ActivityReportPage extends BasePage {
     super(page);
     this.pageTitle = page.locator('h1, [data-testid="page-title"]');
     this.reportForm = page.locator('form, [data-testid="report-form"]');
-    this.generateButton = page.locator('button:has-text("Generate"), [data-testid="generate-btn"]');
-    this.exportButton = page.locator('button:has-text("Export"), [data-testid="export-btn"]');
+    this.generateButton = page.locator(
+      'button:has-text("Generate"), [data-testid="generate-btn"]'
+    );
+    this.exportButton = page.locator(
+      'button:has-text("Export"), [data-testid="export-btn"]'
+    );
     this.reportTable = page.locator('table, [data-testid="report-table"]');
     this.filterSection = page.locator('[data-testid="filters"]');
   }
@@ -35,19 +39,31 @@ export class ActivityReportPage extends BasePage {
     reportType?: string;
   }) {
     if (criteria.startDate) {
-      await this.page.fill('[data-testid="start-date"], input[name="startDate"]', criteria.startDate);
+      await this.page.fill(
+        '[data-testid="start-date"], input[name="startDate"]',
+        criteria.startDate
+      );
     }
-    
+
     if (criteria.endDate) {
-      await this.page.fill('[data-testid="end-date"], input[name="endDate"]', criteria.endDate);
+      await this.page.fill(
+        '[data-testid="end-date"], input[name="endDate"]',
+        criteria.endDate
+      );
     }
 
     if (criteria.department) {
-      await this.page.selectOption('[data-testid="department"], select[name="department"]', criteria.department);
+      await this.page.selectOption(
+        '[data-testid="department"], select[name="department"]',
+        criteria.department
+      );
     }
 
     if (criteria.reportType) {
-      await this.page.selectOption('[data-testid="report-type"], select[name="reportType"]', criteria.reportType);
+      await this.page.selectOption(
+        '[data-testid="report-type"], select[name="reportType"]',
+        criteria.reportType
+      );
     }
   }
 
@@ -59,7 +75,7 @@ export class ActivityReportPage extends BasePage {
   async exportReport(format: 'PDF' | 'Excel' = 'PDF') {
     // Look for export dropdown or direct button
     const exportDropdown = this.page.locator('[data-testid="export-dropdown"]');
-    
+
     if (await exportDropdown.isVisible()) {
       await exportDropdown.click();
       await this.page.locator(`text=${format}`).click();

@@ -3,36 +3,36 @@ export const testData = {
     admin: {
       email: 'admin@company.com',
       name: 'Admin User',
-      role: 'administrator'
+      role: 'administrator',
     },
     manager: {
       email: 'manager@company.com',
       name: 'Manager User',
-      role: 'manager'
+      role: 'manager',
     },
     employee: {
       email: 'employee@company.com',
       name: 'Employee User',
-      role: 'employee'
-    }
+      role: 'employee',
+    },
   },
 
   reportCriteria: {
     monthly: {
       startDate: '2025-01-01',
       endDate: '2025-01-31',
-      reportType: 'Monthly Summary'
+      reportType: 'Monthly Summary',
     },
     quarterly: {
       startDate: '2025-01-01',
       endDate: '2025-03-31',
-      reportType: 'Quarterly Report'
+      reportType: 'Quarterly Report',
     },
     custom: {
       startDate: '2025-01-15',
       endDate: '2025-01-25',
-      reportType: 'Custom Range'
-    }
+      reportType: 'Custom Range',
+    },
   },
 
   departments: [
@@ -40,7 +40,7 @@ export const testData = {
     'Marketing',
     'Sales',
     'Human Resources',
-    'Finance'
+    'Finance',
   ],
 
   reportTypes: [
@@ -48,8 +48,8 @@ export const testData = {
     'Quarterly Report',
     'Annual Review',
     'Custom Range',
-    'Department Specific'
-  ]
+    'Department Specific',
+  ],
 };
 
 export const mockApiResponses = {
@@ -58,8 +58,8 @@ export const mockApiResponses = {
       totalEmployees: 150,
       activeProjects: 12,
       completedTasks: 342,
-      pendingReports: 5
-    }
+      pendingReports: 5,
+    },
   },
 
   reports: {
@@ -70,7 +70,7 @@ export const mockApiResponses = {
         department: 'Engineering',
         hoursWorked: 40,
         tasksCompleted: 8,
-        efficiency: 95
+        efficiency: 95,
       },
       {
         id: 2,
@@ -78,8 +78,8 @@ export const mockApiResponses = {
         department: 'Marketing',
         hoursWorked: 38,
         tasksCompleted: 12,
-        efficiency: 92
-      }
-    ]
-  }
+        efficiency: 92,
+      },
+    ],
+  },
 };

@@ -19,7 +19,7 @@ export class BasePage {
   async waitForPageLoad() {
     // Wait for Angular to load
     await this.page.waitForLoadState('networkidle');
-    
+
     // Wait for loading spinner to disappear if present
     if (await this.loadingSpinner.isVisible()) {
       await this.loadingSpinner.waitFor({ state: 'hidden' });
@@ -31,8 +31,10 @@ export class BasePage {
   }
 
   async navigateTo(route: string) {
-    const link = this.page.locator(`a[href="${route}"], [routerLink="${route}"]`);
-    if (await link.count() > 0) {
+    const link = this.page.locator(
+      `a[href="${route}"], [routerLink="${route}"]`
+    );
+    if ((await link.count()) > 0) {
       await link.click();
     } else {
       await this.page.goto(route);

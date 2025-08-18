@@ -6,10 +6,10 @@ async function globalTeardown(config: FullConfig) {
   try {
     // Clean up any test data
     // await cleanupTestData();
-    
+
     // Clear any cached authentication
     // await clearTestAuthentication();
-    
+
     console.log('✅ Global teardown completed');
   } catch (error) {
     console.error('❌ Global teardown failed:', error);

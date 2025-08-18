@@ -33,7 +33,9 @@ export class DashboardPage extends BasePage {
   }
 
   async clickQuickAction(actionName: string) {
-    const action = this.quickActions.locator(`button:has-text("${actionName}"), a:has-text("${actionName}")`);
+    const action = this.quickActions.locator(
+      `button:has-text("${actionName}"), a:has-text("${actionName}")`
+    );
     await action.click();
   }
 }

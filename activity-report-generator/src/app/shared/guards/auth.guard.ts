@@ -38,9 +38,11 @@ export class AuthGuard implements CanActivate {
       // Window flag set by e2e tests
       (typeof window !== 'undefined' && (window as any).e2eTestMode === true) ||
       // Local storage flag
-      (typeof localStorage !== 'undefined' && localStorage.getItem('e2e_test_mode') === 'true') ||
+      (typeof localStorage !== 'undefined' &&
+        localStorage.getItem('e2e_test_mode') === 'true') ||
       // URL parameter for e2e tests
-      (typeof window !== 'undefined' && window.location.search.includes('e2e=true'))
+      (typeof window !== 'undefined' &&
+        window.location.search.includes('e2e=true'))
     );
   }
 }

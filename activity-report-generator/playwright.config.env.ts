@@ -7,14 +7,14 @@ const environments = {
       command: 'npm start',
       url: 'http://localhost:4200',
       reuseExistingServer: !process.env.CI,
-    }
+    },
   },
   staging: {
     baseURL: 'https://staging.activity-report-generator.com',
   },
   production: {
     baseURL: 'https://activity-report-generator.com',
-  }
+  },
 };
 
 const currentEnv = process.env.TEST_ENV || 'local';
@@ -26,13 +26,13 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  
+
   // Reporter configuration
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
-    process.env.CI ? ['github'] : ['list']
+    process.env.CI ? ['github'] : ['list'],
   ],
 
   use: {
@@ -40,7 +40,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    
+
     // Global test timeout
     actionTimeout: 30000,
     navigationTimeout: 30000,
@@ -93,7 +93,7 @@ export default defineConfig({
   ],
 
   webServer: currentEnv === 'local' ? environments.local.webServer : undefined,
-  
+
   // Global setup and teardown
   globalSetup: require.resolve('./e2e/global-setup.ts'),
   globalTeardown: require.resolve('./e2e/global-teardown.ts'),

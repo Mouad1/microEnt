@@ -15,21 +15,21 @@ test.describe('Activity Report Regression Tests', () => {
     const dateRanges = [
       TestHelpers.generateDateRange('current-month'),
       TestHelpers.generateDateRange('last-month'),
-      TestHelpers.generateDateRange('current-quarter')
+      TestHelpers.generateDateRange('current-quarter'),
     ];
 
     for (const dateRange of dateRanges) {
       await activityReportPage.fillReportCriteria({
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
-        reportType: testData.reportTypes[0]
+        reportType: testData.reportTypes[0],
       });
 
       await activityReportPage.generateReport();
-      
+
       // Verify report generation
       expect(await activityReportPage.isReportTableVisible()).toBe(true);
-      
+
       // Clear form for next iteration
       await page.reload();
       await activityReportPage.verifyPageLoaded();
@@ -38,7 +38,9 @@ test.describe('Activity Report Regression Tests', () => {
 
   test('Export functionality across different formats', async ({ page }) => {
     // Generate a report first
-    await activityReportPage.fillReportCriteria(testData.reportCriteria.monthly);
+    await activityReportPage.fillReportCriteria(
+      testData.reportCriteria.monthly
+    );
     await activityReportPage.generateReport();
 
     // Test PDF export
@@ -58,24 +60,28 @@ test.describe('Activity Report Regression Tests', () => {
     // Test invalid date ranges
     await activityReportPage.fillReportCriteria({
       startDate: '2025-01-31',
-      endDate: '2025-01-01' // End date before start date
+      endDate: '2025-01-01', // End date before start date
     });
 
     await activityReportPage.generateReport();
-    
+
     // Check for error message
-    const errorMessage = page.locator('.error, .alert-danger, [data-testid="error"]');
+    const errorMessage = page.locator(
+      '.error, .alert-danger, [data-testid="error"]'
+    );
     await expect(errorMessage).toBeVisible();
   });
 
   test('Responsive design verification', async ({ page }) => {
     await TestHelpers.verifyResponseiveDesign(page);
-    
+
     // Verify form is still functional on mobile
     await page.setViewportSize({ width: 375, height: 667 });
-    await activityReportPage.fillReportCriteria(testData.reportCriteria.monthly);
+    await activityReportPage.fillReportCriteria(
+      testData.reportCriteria.monthly
+    );
     await activityReportPage.generateReport();
-    
+
     expect(await activityReportPage.isReportTableVisible()).toBe(true);
   });
 

@@ -20,7 +20,7 @@ test.describe('Report Generation Business Flow', () => {
       startDate: '2025-01-01',
       endDate: '2025-01-31',
       department: 'Engineering',
-      reportType: 'Monthly Summary'
+      reportType: 'Monthly Summary',
     });
 
     // Step 4: Generate report
@@ -28,7 +28,7 @@ test.describe('Report Generation Business Flow', () => {
 
     // Step 5: Verify report is generated
     await expect(activityReportPage.isReportTableVisible()).resolves.toBe(true);
-    
+
     // Step 6: Verify report has data
     const rowsCount = await activityReportPage.getReportRowsCount();
     expect(rowsCount).toBeGreaterThan(0);
@@ -41,16 +41,16 @@ test.describe('Report Generation Business Flow', () => {
     await activityReportPage.goto();
     await activityReportPage.fillReportCriteria({
       startDate: '2025-01-01',
-      endDate: '2025-01-31'
+      endDate: '2025-01-31',
     });
     await activityReportPage.generateReport();
 
     // Start download monitoring
     const downloadPromise = page.waitForEvent('download');
-    
+
     // Export the report
     await activityReportPage.exportReport('PDF');
-    
+
     // Verify download starts
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toContain('.pdf');
